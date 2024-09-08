@@ -16,7 +16,7 @@ public class LocalRegistry {
      * @param key
      * @param implClass
      */
-    public static void registry(String key,Class<?> implClass){
+    public static void register(String key, Class<?> implClass){
         map.put(key,implClass);
     }
 

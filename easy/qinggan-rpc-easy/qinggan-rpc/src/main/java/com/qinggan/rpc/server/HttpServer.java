@@ -1,4 +1,4 @@
-package com.qinggan.server;
+package com.qinggan.rpc.server;
 
 /**
  * Description: Http服务接口

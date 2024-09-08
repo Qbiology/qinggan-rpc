@@ -41,6 +41,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
             if(rpcRequest==null){
                 rpcResponse.setMessage("rpcRequest is null");
                 doResponse(request,rpcResponse,serializer);
+                return;
             }
 
             try {
@@ -71,7 +72,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
      */
     void doResponse(HttpServerRequest request, RpcResponse rpcResponse, Serializer serializer){
         HttpServerResponse httpServerResponse = request.response()
-                .putHeader("content-type","json");
+                .putHeader("content-type","application/json");
 
         try {
             byte[] bytes = serializer.serializer(rpcResponse);

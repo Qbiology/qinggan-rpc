@@ -1,6 +1,8 @@
 package com.qinggan.provider;
 
-import com.qinggan.server.VertxHttpServer;
+import com.qinggan.common.service.UserService;
+import com.qinggan.rpc.registry.LocalRegistry;
+import com.qinggan.rpc.server.VertxHttpServer;
 
 /**
  * Description: 简易服务提供者示例
@@ -9,8 +11,10 @@ import com.qinggan.server.VertxHttpServer;
  */
 public class EasyProvider {
     public static void main(String[] args) {
-        VertxHttpServer server = new VertxHttpServer();
+        // 注册服务
+        LocalRegistry.register(UserService.class.getName(), UserServiceImpl.class);
 
+        VertxHttpServer server = new VertxHttpServer();
         server.doStart(8080);
     }
 }

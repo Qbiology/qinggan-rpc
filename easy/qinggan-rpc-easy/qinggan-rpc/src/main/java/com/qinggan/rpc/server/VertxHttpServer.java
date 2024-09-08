@@ -1,4 +1,4 @@
-package com.qinggan.server;
+package com.qinggan.rpc.server;
 
 import io.vertx.core.Vertx;
 
@@ -17,15 +17,7 @@ public class VertxHttpServer implements HttpServer{
         io.vertx.core.http.HttpServer server = vertx.createHttpServer();
 
         //处理请求
-        server.requestHandler(request -> {
-            //处理Http请求
-            System.out.println("Receive request:"+request.method()+" "+request.uri());
-
-            //发送Http响应
-            request.response()
-                    .putHeader("context-type","text/plain")
-                    .end("Hello from Vertx Http server!");
-        });
+        server.requestHandler(new HttpServerHandler());
 
         //监听端口
         server.listen(port,result -> {
