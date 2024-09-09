@@ -1,0 +1,4 @@
+rpc:
+  name: qingganhhh
+  version: 2.2
+  serverPort: 8087
