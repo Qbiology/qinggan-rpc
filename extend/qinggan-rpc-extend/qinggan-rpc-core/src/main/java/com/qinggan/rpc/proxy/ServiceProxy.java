@@ -2,6 +2,8 @@ package com.qinggan.rpc.proxy;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import com.qinggan.rpc.RpcApplication;
+import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.model.RpcRequest;
 import com.qinggan.rpc.model.RpcResponse;
 import com.qinggan.rpc.serializer.JdkSerializer;
@@ -35,7 +37,9 @@ public class ServiceProxy implements InvocationHandler {
         try {
             byte[] bytes = serializer.serializer(rpcRequest);
             byte[] result;
-            try(HttpResponse httpResponse = HttpRequest.post("http://localhost:8080")
+            RpcConfig rpcConfig = RpcApplication.getRpcConfig();
+            String url = "http://"+rpcConfig.getServerHost()+":"+rpcConfig.getServerPort();//http://localhost:8087
+            try(HttpResponse httpResponse = HttpRequest.post(url)
                     .body(bytes)
                     .execute()){
                 result = httpResponse.bodyBytes();

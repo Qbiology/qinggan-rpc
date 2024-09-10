@@ -12,8 +12,8 @@ import com.qinggan.rpc.server.VertxHttpServer;
  */
 public class EasyProvider {
     public static void main(String[] args) {
-        //RpcApplication.init();
-        RpcApplication.init();
+
+        RpcApplication.init("yaml");
         // 注册服务
         LocalRegistry.register(UserService.class.getName(), UserServiceImpl.class);
 

@@ -70,11 +70,10 @@ public class ConfigUtilsExtend {
         } else if (extension.equals(PROPERTIES_EXTENSION)) {
             return loadFromProperties(configFileName, tClass, prefix);
         }
-
         return null;
     }
 
-    private static RpcConfig loadFromYaml(String configFileName, String prefix) throws InstantiationException, IllegalAccessException {
+    private static RpcConfig loadFromYaml(String configFileName, String prefix){
         InputStream inputStream = ConfigUtils.class.getClassLoader().getResourceAsStream(configFileName);
         Yaml yaml = new Yaml();
         Map<String, Object> yamlMap = yaml.load(inputStream);
