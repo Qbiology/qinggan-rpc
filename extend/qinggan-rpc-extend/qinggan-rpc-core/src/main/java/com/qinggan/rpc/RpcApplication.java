@@ -2,7 +2,8 @@ package com.qinggan.rpc;
 
 import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.constant.RpcConstant;
-import com.qinggan.rpc.utils.ConfigUtils;
+import com.qinggan.rpc.utils.ConfigUtilsExtend;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,10 +23,20 @@ public class RpcApplication {
         log.info("rpc init, config = {}",rpcConfig.toString());
     }
 
+    public static void init(String preferredExt){
+        RpcConfig newRpcConfig;
+        try {
+            newRpcConfig = ConfigUtilsExtend.loadConfig(RpcConfig.class, RpcConstant.DEFAULT_CONFIG_PREFIX, preferredExt);
+        }catch (Exception e){
+            newRpcConfig = new RpcConfig();
+        }
+        init(newRpcConfig);
+    }
+
     public static void init(){
         RpcConfig newRpcConfig;
         try {
-            newRpcConfig = ConfigUtils.loadConfig(RpcConfig.class, RpcConstant.DEFAULT_CONFIG_PREFIX);
+            newRpcConfig = ConfigUtilsExtend.loadConfig(RpcConfig.class, RpcConstant.DEFAULT_CONFIG_PREFIX);
         }catch (Exception e){
             newRpcConfig = new RpcConfig();
         }
@@ -33,9 +44,9 @@ public class RpcApplication {
     }
 
     public static RpcConfig getRpcConfig(){
-        if(rpcConfig==null){
+        if(rpcConfig == null){
             synchronized (RpcApplication.class){
-                if(rpcConfig==null){
+                if(rpcConfig == null){
                     init();
                 }
             }

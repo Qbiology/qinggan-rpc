@@ -1,5 +1,6 @@
 rpc:
   name: qinggan
   version: 2.3
-  serverPort: 8086
-  mock: true
+  serverPort: 8848
+  mock: false
+  serializer: kryo

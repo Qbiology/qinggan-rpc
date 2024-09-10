@@ -3,6 +3,7 @@ package com.qinggan.consumer;
 
 import com.qinggan.common.model.User;
 import com.qinggan.common.service.UserService;
+import com.qinggan.rpc.RpcApplication;
 import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.proxy.ServiceProxyFactory;
 import com.qinggan.rpc.utils.ConfigUtils;

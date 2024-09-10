@@ -2,6 +2,7 @@ package com.qinggan.provider;
 
 import com.qinggan.common.service.UserService;
 import com.qinggan.rpc.RpcApplication;
+import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.registry.LocalRegistry;
 import com.qinggan.rpc.server.VertxHttpServer;
 
@@ -14,6 +15,7 @@ public class EasyProvider {
     public static void main(String[] args) {
 
         RpcApplication.init("yaml");
+
         // 注册服务
         LocalRegistry.register(UserService.class.getName(), UserServiceImpl.class);
 

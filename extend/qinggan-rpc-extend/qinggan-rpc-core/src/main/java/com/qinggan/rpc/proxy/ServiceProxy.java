@@ -8,6 +8,7 @@ import com.qinggan.rpc.model.RpcRequest;
 import com.qinggan.rpc.model.RpcResponse;
 import com.qinggan.rpc.serializer.JdkSerializer;
 import com.qinggan.rpc.serializer.Serializer;
+import com.qinggan.rpc.serializer.SerializerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -23,8 +24,9 @@ public class ServiceProxy implements InvocationHandler {
     //调用代理
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        //指定序列化器
-        Serializer serializer = new JdkSerializer();
+        // 指定序列化器
+        final Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
+
 
         //发请求
         RpcRequest rpcRequest = RpcRequest.builder()
@@ -35,7 +37,7 @@ public class ServiceProxy implements InvocationHandler {
                 .build();
 
         try {
-            byte[] bytes = serializer.serializer(rpcRequest);
+            byte[] bytes = serializer.serialize(rpcRequest);
             byte[] result;
             RpcConfig rpcConfig = RpcApplication.getRpcConfig();
             String url = "http://"+rpcConfig.getServerHost()+":"+rpcConfig.getServerPort();//http://localhost:8087
@@ -44,7 +46,7 @@ public class ServiceProxy implements InvocationHandler {
                     .execute()){
                 result = httpResponse.bodyBytes();
             }
-            RpcResponse rpcResponse = serializer.deserializer(result,RpcResponse.class);
+            RpcResponse rpcResponse = serializer.deserialize(result,RpcResponse.class);
             return rpcResponse.getData();
         } catch (IOException e) {
             e.printStackTrace();

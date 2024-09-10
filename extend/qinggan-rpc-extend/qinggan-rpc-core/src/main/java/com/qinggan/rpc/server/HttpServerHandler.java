@@ -1,10 +1,12 @@
 package com.qinggan.rpc.server;
 
+import com.qinggan.rpc.RpcApplication;
 import com.qinggan.rpc.model.RpcRequest;
 import com.qinggan.rpc.model.RpcResponse;
 import com.qinggan.rpc.registry.LocalRegistry;
 import com.qinggan.rpc.serializer.JdkSerializer;
 import com.qinggan.rpc.serializer.Serializer;
+import com.qinggan.rpc.serializer.SerializerFactory;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
@@ -22,8 +24,9 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
 
     @Override
     public void handle(HttpServerRequest request) {
-        //指定序列化器
-        final Serializer serializer = new JdkSerializer();
+        // 指定序列化器
+        final Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
+
         //记录日志
         System.out.println("Receive request:"+request.method()+" "+request.uri());
 
@@ -32,7 +35,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
             byte[] bytes = body.getBytes();
             RpcRequest rpcRequest = null;
             try {
-                rpcRequest = serializer.deserializer(bytes, RpcRequest.class);
+                rpcRequest = serializer.deserialize(bytes, RpcRequest.class);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -75,7 +78,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
                 .putHeader("content-type","application/json");
 
         try {
-            byte[] bytes = serializer.serializer(rpcResponse);
+            byte[] bytes = serializer.serialize(rpcResponse);
             httpServerResponse.end(Buffer.buffer(bytes));
         } catch (IOException e) {
             e.printStackTrace();
