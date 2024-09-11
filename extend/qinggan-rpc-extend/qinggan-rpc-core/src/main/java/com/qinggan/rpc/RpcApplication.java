@@ -1,7 +1,10 @@
 package com.qinggan.rpc;
 
+import com.qinggan.rpc.config.RegistryConfig;
 import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.constant.RpcConstant;
+import com.qinggan.rpc.registry.Registry;
+import com.qinggan.rpc.registry.RegistryFactory;
 import com.qinggan.rpc.utils.ConfigUtilsExtend;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,11 @@ public class RpcApplication {
     public static void init(RpcConfig newRpcConfig){
         rpcConfig = newRpcConfig;
         log.info("rpc init, config = {}",rpcConfig.toString());
+
+        RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
+        Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
+        registry.init(registryConfig);
+        log.info("registry init, config = {}", registryConfig);
     }
 
     public static void init(String preferredExt){

@@ -2,8 +2,13 @@ package com.qinggan.provider;
 
 import com.qinggan.common.service.UserService;
 import com.qinggan.rpc.RpcApplication;
+import com.qinggan.rpc.config.RegistryConfig;
 import com.qinggan.rpc.config.RpcConfig;
+import com.qinggan.rpc.model.ServiceMetaInfo;
 import com.qinggan.rpc.registry.LocalRegistry;
+import com.qinggan.rpc.registry.Registry;
+import com.qinggan.rpc.registry.RegistryFactory;
+import com.qinggan.rpc.server.HttpServer;
 import com.qinggan.rpc.server.VertxHttpServer;
 
 /**
@@ -11,15 +16,34 @@ import com.qinggan.rpc.server.VertxHttpServer;
  * Author: 1401687501x's
  * Date: 2024/9/8 14:59
  */
-public class EasyProvider {
-    public static void main(String[] args) {
 
-        RpcApplication.init("yaml");
+public class EasyProvider {
+
+    public static void main(String[] args) {
+        // RPC 框架初始化
+        RpcApplication.init();
 
         // 注册服务
-        LocalRegistry.register(UserService.class.getName(), UserServiceImpl.class);
+        String serviceName = UserService.class.getName();
+        LocalRegistry.register(serviceName, UserServiceImpl.class);
 
-        VertxHttpServer server = new VertxHttpServer();
-        server.doStart(RpcApplication.getRpcConfig().getServerPort());
+        // 注册服务到注册中心
+        RpcConfig rpcConfig = RpcApplication.getRpcConfig();
+        RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
+        Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
+        ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
+        serviceMetaInfo.setServiceName(serviceName);
+        serviceMetaInfo.setServiceHost(rpcConfig.getServerHost());
+        serviceMetaInfo.setServicePort(rpcConfig.getServerPort());
+        try {
+            registry.register(serviceMetaInfo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // 启动 web 服务
+        HttpServer httpServer = new VertxHttpServer();
+        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
     }
 }
+
