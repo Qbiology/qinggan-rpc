@@ -1,7 +1,12 @@
 package com.qinggan.rpc.registry;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.cron.CronUtil;
+import cn.hutool.cron.task.Task;
 import cn.hutool.json.JSONUtil;
+import com.qinggan.rpc.RpcApplication;
 import com.qinggan.rpc.config.RegistryConfig;
+import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.model.ServiceMetaInfo;
 import io.etcd.jetcd.*;
 import io.etcd.jetcd.kv.GetResponse;
@@ -11,7 +16,10 @@ import io.etcd.jetcd.options.PutOption;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -32,6 +40,11 @@ public class EtcdRegistry implements Registry{
      */
     private static final String ETCD_ROOT_PATH = "/rpc/";
 
+    /**
+     * 本机注册的节点key集合
+     */
+    private Set<String> localRegistryNodeKeySet = new HashSet<>();
+
     @Override
     public void init(RegistryConfig registryConfig) {
         client = Client.builder()
@@ -39,6 +52,7 @@ public class EtcdRegistry implements Registry{
                 .connectTimeout(Duration.ofMillis(registryConfig.getTimeout()))
                 .build();
         kvClient = client.getKVClient();
+        heartBeat();
     }
 
     @Override
@@ -47,7 +61,7 @@ public class EtcdRegistry implements Registry{
         Lease leaseClient = client.getLeaseClient();
 
         // 创建一个 30 秒的租约
-        long leaseId = leaseClient.grant(30000).get().getID();
+        long leaseId = leaseClient.grant(30).get().getID();
 
         // 设置要存储的键值对
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
@@ -57,12 +71,15 @@ public class EtcdRegistry implements Registry{
         // 将键值对与租约关联起来，并设置过期时间
         PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
         kvClient.put(key, value, putOption).get();
+        localRegistryNodeKeySet.add(registerKey);
     }
 
 
     @Override
     public void unRegister(ServiceMetaInfo serviceMetaInfo) throws Exception {
-        kvClient.delete(ByteSequence.from(ETCD_ROOT_PATH+serviceMetaInfo.getServiceNodeKey(),StandardCharsets.UTF_8)).get();
+        String registryKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
+        kvClient.delete(ByteSequence.from(registryKey,StandardCharsets.UTF_8)).get();
+        localRegistryNodeKeySet.remove(registryKey);
     }
 
     @Override
@@ -96,5 +113,33 @@ public class EtcdRegistry implements Registry{
         if(kvClient!=null){
             kvClient.close();
         }
+    }
+
+    @Override
+    public void heartBeat() {
+        CronUtil.schedule("*/10 * * * * *", new Task(){
+            @Override
+            public void execute() {
+                for(String localRegistryNodeKey : localRegistryNodeKeySet){
+                    try {
+                        List<KeyValue> kvs = kvClient.get(ByteSequence.from(localRegistryNodeKey, StandardCharsets.UTF_8))
+                                .get()
+                                .getKvs();
+                        if (CollUtil.isEmpty(kvs)){
+                            continue;
+                        }
+                        KeyValue keyValue = kvs.get(0);
+                        String s = keyValue.getValue().toString(StandardCharsets.UTF_8);
+                        ServiceMetaInfo serviceMetaInfo = JSONUtil.toBean(s,ServiceMetaInfo.class);
+                        register(serviceMetaInfo);
+                    } catch (Exception e) {
+                        throw new RuntimeException(localRegistryNodeKey+"续签失败",e);
+                    }
+                }
+            }
+        });
+
+        CronUtil.setMatchSecond(true);
+        CronUtil.start();
     }
 }
