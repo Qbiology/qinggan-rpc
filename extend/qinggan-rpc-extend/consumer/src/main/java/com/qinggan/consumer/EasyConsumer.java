@@ -21,18 +21,18 @@ public class EasyConsumer {
         User newUser1 = userService.getUser(user);
         System.out.println(newUser1.getName()+"1");
 
-        UserService userService1 = ServiceProxyFactory.getProxy(UserService.class);
-        User newUser2 = userService1.getUser(user);
-        System.out.println(newUser2.getName()+"2");
-
-          try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        UserService userService2 = ServiceProxyFactory.getProxy(UserService.class);
-        User newUser3 = userService2.getUser(user);
-        System.out.println(newUser3.getName()+"3");
+//        UserService userService1 = ServiceProxyFactory.getProxy(UserService.class);
+//        User newUser2 = userService1.getUser(user);
+//        System.out.println(newUser2.getName()+"2");
+//
+//          try {
+//            Thread.sleep(15000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        UserService userService2 = ServiceProxyFactory.getProxy(UserService.class);
+//        User newUser3 = userService2.getUser(user);
+//        System.out.println(newUser3.getName()+"3");
     }
 }

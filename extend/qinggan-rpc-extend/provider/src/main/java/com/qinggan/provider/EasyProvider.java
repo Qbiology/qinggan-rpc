@@ -10,6 +10,7 @@ import com.qinggan.rpc.registry.Registry;
 import com.qinggan.rpc.registry.RegistryFactory;
 import com.qinggan.rpc.server.HttpServer;
 import com.qinggan.rpc.server.VertxHttpServer;
+import com.qinggan.rpc.server.tcp.VertxTcpServer;
 
 /**
  * Description: 简易服务提供者示例
@@ -42,8 +43,10 @@ public class EasyProvider {
         }
 
         // 启动 web 服务
-        HttpServer httpServer = new VertxHttpServer();
-        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+        VertxTcpServer vertxTcpServer = new VertxTcpServer();
+        vertxTcpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+//        HttpServer httpServer = new VertxHttpServer();
+//        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
     }
 }
 
