@@ -3,4 +3,4 @@ rpc:
   version: 2.3
   serverPort: 8848
   mock: false
-  serializer: kryo
+  serializer: jdk

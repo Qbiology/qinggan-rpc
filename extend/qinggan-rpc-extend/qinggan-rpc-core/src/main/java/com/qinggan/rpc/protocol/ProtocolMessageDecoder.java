@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class ProtocolMessageDecoder {
 
-    public static ProtocolMessage<?> decoder(Buffer buffer) throws IOException {
+    public static ProtocolMessage<?> decode(Buffer buffer) throws IOException {
         ProtocolMessage.Header header = new ProtocolMessage.Header();
 
         if(buffer.getByte(0)!=ProtocolConstant.PROTOCOL_MAGIC){

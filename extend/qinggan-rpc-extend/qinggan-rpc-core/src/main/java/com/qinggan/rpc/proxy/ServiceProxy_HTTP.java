@@ -1,7 +1,8 @@
 package com.qinggan.rpc.proxy;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.IdUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import com.qinggan.rpc.RpcApplication;
 import com.qinggan.rpc.config.RegistryConfig;
 import com.qinggan.rpc.config.RpcConfig;
@@ -9,25 +10,22 @@ import com.qinggan.rpc.constant.RpcConstant;
 import com.qinggan.rpc.model.RpcRequest;
 import com.qinggan.rpc.model.RpcResponse;
 import com.qinggan.rpc.model.ServiceMetaInfo;
-import com.qinggan.rpc.protocol.*;
 import com.qinggan.rpc.registry.Registry;
 import com.qinggan.rpc.registry.RegistryFactory;
 import com.qinggan.rpc.serializer.Serializer;
 import com.qinggan.rpc.serializer.SerializerFactory;
-import com.qinggan.rpc.server.tcp.VertxTcpClient;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
 
-
 /**
  * Description: 动态代理
  * Author: 1401687501x's
  * Date: 2024/9/8 21:22
  */
-public class ServiceProxy implements InvocationHandler {
+public class ServiceProxy_HTTP implements InvocationHandler {
 
     //调用代理
     @Override
@@ -60,7 +58,16 @@ public class ServiceProxy implements InvocationHandler {
                 throw new RuntimeException("暂无服务地址");
             }
             ServiceMetaInfo selectServiceMetaInfo = serviceMetaInfoList.get(0);
-            RpcResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, selectServiceMetaInfo);
+
+            byte[] result;
+            //RpcConfig rpcConfig = RpcApplication.getRpcConfig();
+            //String url = "http://"+rpcConfig.getServerHost()+":"+rpcConfig.getServerPort();//http://localhost:8087
+            try(HttpResponse httpResponse = HttpRequest.post(selectServiceMetaInfo.getServiceAddress())
+                    .body(bytes)
+                    .execute()){
+                result = httpResponse.bodyBytes();
+            }
+            RpcResponse rpcResponse = serializer.deserialize(result,RpcResponse.class);
             return rpcResponse.getData();
         } catch (IOException e) {
             e.printStackTrace();

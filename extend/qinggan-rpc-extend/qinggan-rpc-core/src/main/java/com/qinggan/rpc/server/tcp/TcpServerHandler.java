@@ -12,7 +12,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -23,11 +22,11 @@ import java.lang.reflect.Method;
 public class TcpServerHandler implements Handler<NetSocket> {
 
     @Override
-    public void handle(NetSocket netSocket) {
-        netSocket.handler(buffer -> {
+    public void handle(NetSocket socket) {
+        TcpBufferHandlerWrapper bufferHandlerWrapper = new TcpBufferHandlerWrapper(buffer -> {
             ProtocolMessage<RpcRequest> protocolMessage;
             try {
-                protocolMessage = (ProtocolMessage<RpcRequest>) ProtocolMessageDecoder.decoder(buffer);
+                protocolMessage = (ProtocolMessage<RpcRequest>) ProtocolMessageDecoder.decode(buffer);
             } catch (IOException e) {
                 throw new RuntimeException("协议消息解码错误");
             }
@@ -52,10 +51,11 @@ public class TcpServerHandler implements Handler<NetSocket> {
             ProtocolMessage<RpcResponse> responseProtocolMessage = new ProtocolMessage<>(header,rpcResponse);
             try {
                 Buffer responseBuffer = ProtocolMessageEncoder.encode(responseProtocolMessage);
-                netSocket.write(responseBuffer);
+                socket.write(responseBuffer);
             } catch (IOException e) {
                 throw new RuntimeException("协议消息编码错误");
             }
         });
+        socket.handler(bufferHandlerWrapper);
     }
 }
