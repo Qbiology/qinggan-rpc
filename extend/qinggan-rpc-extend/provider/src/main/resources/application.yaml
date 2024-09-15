@@ -3,3 +3,4 @@ rpc:
   version: 2.3
   serverPort: 8848
   serializer: jdk
+  loadBalancer: roundRobin

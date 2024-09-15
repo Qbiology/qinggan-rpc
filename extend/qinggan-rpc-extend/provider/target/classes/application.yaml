@@ -2,4 +2,4 @@ rpc:
   name: 青柑
   version: 2.3
   serverPort: 8848
-  serializer: kryo
+  serializer: jdk

@@ -1,15 +1,15 @@
 package com.qinggan.rpc.proxy;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.IdUtil;
 import com.qinggan.rpc.RpcApplication;
 import com.qinggan.rpc.config.RegistryConfig;
 import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.constant.RpcConstant;
+import com.qinggan.rpc.loadbalancer.LoadBalancer;
+import com.qinggan.rpc.loadbalancer.LoadBalancerFactory;
 import com.qinggan.rpc.model.RpcRequest;
 import com.qinggan.rpc.model.RpcResponse;
 import com.qinggan.rpc.model.ServiceMetaInfo;
-import com.qinggan.rpc.protocol.*;
 import com.qinggan.rpc.registry.Registry;
 import com.qinggan.rpc.registry.RegistryFactory;
 import com.qinggan.rpc.serializer.Serializer;
@@ -19,7 +19,9 @@ import com.qinggan.rpc.server.tcp.VertxTcpClient;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -59,7 +61,13 @@ public class ServiceProxy implements InvocationHandler {
             if(CollUtil.isEmpty(serviceMetaInfoList)){
                 throw new RuntimeException("暂无服务地址");
             }
-            ServiceMetaInfo selectServiceMetaInfo = serviceMetaInfoList.get(0);
+
+            String loadBalancerName = rpcConfig.getLoadBalancer();
+            LoadBalancer loadBalancer = LoadBalancerFactory.getInstance(loadBalancerName);
+            Map<String,Object> requestParams = new HashMap<>();
+            requestParams.put("methodName",rpcRequest.getMethodName());
+            ServiceMetaInfo selectServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
+
             RpcResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, selectServiceMetaInfo);
             return rpcResponse.getData();
         } catch (IOException e) {

@@ -1,5 +1,6 @@
 package com.qinggan.rpc.config;
 
+import com.qinggan.rpc.loadbalancer.LoadBalancerKeys;
 import com.qinggan.rpc.serializer.SerializerKeys;
 import lombok.Data;
 
@@ -32,4 +33,6 @@ public class RpcConfig {
      * 注册中心配置
      */
     RegistryConfig registryConfig = new RegistryConfig();
+
+    private String loadBalancer = LoadBalancerKeys.ROUND_ROBIN;
 }
