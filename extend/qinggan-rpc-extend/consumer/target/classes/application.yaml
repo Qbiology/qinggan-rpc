@@ -4,3 +4,5 @@ rpc:
   serverPort: 8848
   mock: false
   serializer: jdk
+  loadBalancer: roundRobin
+  retryStrategy: exponentialBackoff

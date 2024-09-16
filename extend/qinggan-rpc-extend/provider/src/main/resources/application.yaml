@@ -4,3 +4,4 @@ rpc:
   serverPort: 8848
   serializer: jdk
   loadBalancer: roundRobin
+  retryStrategy: exponentialBackoff

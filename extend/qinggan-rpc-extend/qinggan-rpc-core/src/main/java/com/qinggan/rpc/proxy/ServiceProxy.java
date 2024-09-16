@@ -5,6 +5,8 @@ import com.qinggan.rpc.RpcApplication;
 import com.qinggan.rpc.config.RegistryConfig;
 import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.constant.RpcConstant;
+import com.qinggan.rpc.fault.retry.RetryStrategy;
+import com.qinggan.rpc.fault.retry.RetryStrategyFactory;
 import com.qinggan.rpc.loadbalancer.LoadBalancer;
 import com.qinggan.rpc.loadbalancer.LoadBalancerFactory;
 import com.qinggan.rpc.model.RpcRequest;
@@ -68,12 +70,13 @@ public class ServiceProxy implements InvocationHandler {
             requestParams.put("methodName",rpcRequest.getMethodName());
             ServiceMetaInfo selectServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
 
-            RpcResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, selectServiceMetaInfo);
+            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+            RpcResponse rpcResponse = retryStrategy.doRetry(()->
+                VertxTcpClient.doRequest(rpcRequest, selectServiceMetaInfo)
+            );
             return rpcResponse.getData();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("调用失败");
         }
-
-        return null;
     }
 }

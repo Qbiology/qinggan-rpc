@@ -1,5 +1,6 @@
 package com.qinggan.rpc.config;
 
+import com.qinggan.rpc.fault.retry.RetryStrategyKeys;
 import com.qinggan.rpc.loadbalancer.LoadBalancerKeys;
 import com.qinggan.rpc.serializer.SerializerKeys;
 import lombok.Data;
@@ -34,5 +35,13 @@ public class RpcConfig {
      */
     RegistryConfig registryConfig = new RegistryConfig();
 
+    /**
+     * 负载均衡器配置
+     */
     private String loadBalancer = LoadBalancerKeys.ROUND_ROBIN;
+
+    /**
+     * 重试策略配置
+     */
+    private String retryStrategy = RetryStrategyKeys.NO;
 }

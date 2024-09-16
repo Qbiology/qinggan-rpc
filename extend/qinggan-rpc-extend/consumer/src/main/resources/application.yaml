@@ -5,3 +5,4 @@ rpc:
   mock: false
   serializer: jdk
   loadBalancer: roundRobin
+  retryStrategy: exponentialBackoff
