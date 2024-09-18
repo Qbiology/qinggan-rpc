@@ -1,6 +1,7 @@
 package com.qinggan.rpc.config;
 
 import com.qinggan.rpc.fault.retry.RetryStrategyKeys;
+import com.qinggan.rpc.fault.tolerant.TolerantStrategyKeys;
 import com.qinggan.rpc.loadbalancer.LoadBalancerKeys;
 import com.qinggan.rpc.serializer.SerializerKeys;
 import lombok.Data;
@@ -44,4 +45,9 @@ public class RpcConfig {
      * 重试策略配置
      */
     private String retryStrategy = RetryStrategyKeys.NO;
+
+    /**
+     * 容错策略配置
+     */
+    private String TolerantStrategy = TolerantStrategyKeys.FAIL_FAST;
 }

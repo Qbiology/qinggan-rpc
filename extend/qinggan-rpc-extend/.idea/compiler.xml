@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="qinggan-rpc-core" />
         <module name="common" />
+        <module name="qinggan-rpc-spring-boot-starter" />
         <module name="provider" />
         <module name="consumer" />
       </profile>

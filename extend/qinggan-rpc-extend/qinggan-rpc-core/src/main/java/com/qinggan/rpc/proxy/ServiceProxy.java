@@ -7,6 +7,8 @@ import com.qinggan.rpc.config.RpcConfig;
 import com.qinggan.rpc.constant.RpcConstant;
 import com.qinggan.rpc.fault.retry.RetryStrategy;
 import com.qinggan.rpc.fault.retry.RetryStrategyFactory;
+import com.qinggan.rpc.fault.tolerant.TolerantStrategy;
+import com.qinggan.rpc.fault.tolerant.TolerantStrategyFactory;
 import com.qinggan.rpc.loadbalancer.LoadBalancer;
 import com.qinggan.rpc.loadbalancer.LoadBalancerFactory;
 import com.qinggan.rpc.model.RpcRequest;
@@ -70,10 +72,17 @@ public class ServiceProxy implements InvocationHandler {
             requestParams.put("methodName",rpcRequest.getMethodName());
             ServiceMetaInfo selectServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
 
-            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
-            RpcResponse rpcResponse = retryStrategy.doRetry(()->
-                VertxTcpClient.doRequest(rpcRequest, selectServiceMetaInfo)
-            );
+            RpcResponse rpcResponse;
+            try {
+                RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+                rpcResponse = retryStrategy.doRetry(()->
+                        VertxTcpClient.doRequest(rpcRequest, selectServiceMetaInfo)
+                );
+            }catch (Exception e){
+                TolerantStrategy tolerantStrategy = TolerantStrategyFactory.getInstance(rpcConfig.getTolerantStrategy());
+                rpcResponse = tolerantStrategy.doTolerant(null,e);
+            }
+
             return rpcResponse.getData();
         } catch (IOException e) {
             throw new RuntimeException("调用失败");

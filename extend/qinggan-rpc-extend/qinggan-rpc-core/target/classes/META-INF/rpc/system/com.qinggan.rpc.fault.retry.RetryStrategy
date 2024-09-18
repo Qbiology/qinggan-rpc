@@ -1,0 +1,3 @@
+no=com.qinggan.rpc.fault.retry.NoRetryStrategy
+fixedInterval=com.qinggan.rpc.fault.retry.FixedIntervalRetryStrategy
+exponentialBackoff=com.qinggan.rpc.fault.retry.ExponentialBackoffRetryStrategy
