@@ -7,10 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="example-springboot-provider" />
         <module name="qinggan-rpc-core" />
         <module name="common" />
         <module name="qinggan-rpc-spring-boot-starter" />
         <module name="provider" />
+        <module name="example-springboot-consumer" />
         <module name="consumer" />
       </profile>
     </annotationProcessing>

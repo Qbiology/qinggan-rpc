@@ -1,0 +1,4 @@
+failBack=com.qinggan.rpc.fault.tolerant.FailBackTolerantStrategy
+failFast=com.qinggan.rpc.fault.tolerant.FailFastTolerantStrategy
+failOver=com.qinggan.rpc.fault.tolerant.FailOverTolerantStrategy
+failSafe=com.qinggan.rpc.fault.tolerant.FailSafeTolerantStrategy

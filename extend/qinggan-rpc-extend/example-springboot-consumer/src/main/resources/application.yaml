@@ -1,0 +1,8 @@
+rpc:
+  name: qinggan
+  version: 2.3
+  serverPort: 8848
+  mock: false
+  serializer: jdk
+  loadBalancer: roundRobin
+  retryStrategy: exponentialBackoff

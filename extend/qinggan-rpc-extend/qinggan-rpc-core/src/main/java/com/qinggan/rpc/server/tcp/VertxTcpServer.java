@@ -1,8 +1,6 @@
 package com.qinggan.rpc.server.tcp;
 
-import com.qinggan.rpc.server.HttpServer;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetServer;
 
 /**
